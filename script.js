@@ -1,4 +1,15 @@
-const video = document.getElementById('video')
+// init email sending service
+(function () {
+  emailjs.init("user_a7h6rpgrHx5QMHzQDDdeb");
+})();
+// emails sents to
+const sentEmails = [];
+
+const video = document.getElementById('video');
+const imageUpload = document.getElementById('imageUpload');
+const _start = document.getElementById('start');
+const descriptors = [];
+let start = false;
 
 Promise.all([
   faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
@@ -6,39 +17,85 @@ Promise.all([
   faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
   faceapi.nets.faceExpressionNet.loadFromUri('/models'),
   faceapi.nets.ssdMobilenetv1.loadFromUri('/models')
-]).then(startVideo);
+]).then(initApp);
 
-function startVideo() {
-  navigator.getUserMedia(
-    { video: {}, },
-    stream => video.srcObject = stream,
-    err => console.error(err),
-  )
+function initApp() {
+  if (start) {
+    navigator.getUserMedia(
+      { video: {}, },
+      stream => video.srcObject = stream,
+      err => console.error(err),
+    )
+  }
 }
 
-video.addEventListener('play', async() => {
+// adding images
+imageUpload.addEventListener('change', async () => {
+  // recognize my image
+  const descriptions = [];
+  console.log('see ->', imageUpload.files);
+  Array.from(imageUpload.files).forEach(async (image) => {
+    let img = await faceapi.bufferToImage(image);
+    let detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+    if (detections) descriptions.push(detections.descriptor);
+  });
+
+  let name = document.querySelector('#name').value;
+  console.log('see name ->', name);
+  const descriptor = new faceapi.LabeledFaceDescriptors(name, descriptions);
+  console.log(descriptor);
+  if (descriptor) descriptors.push(descriptor);
+});
+
+video.addEventListener('play', async () => {
   const canvas = faceapi.createCanvasFromMedia(video);
   document.body.append(canvas);
   const displaySize = { width: video.width, height: video.height };
   faceapi.matchDimensions(canvas, displaySize);
-  // recognize my image
-  const descriptions = [];
-  const img = await faceapi.fetchImage('https://avatars0.githubusercontent.com/u/11447549?s=460&v=4');
-  const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-  descriptions.push(detections.descriptor)
-  const descriptors = new faceapi.LabeledFaceDescriptors("Mucyo Fred", descriptions);
-  const faceMatcher = new faceapi.FaceMatcher(descriptors, 0.6);
-
-  setInterval(async () => {
-    const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
-    console.log(detections);
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
-    results.forEach((result, i) => {
-      const box = resizedDetections[i].detection.box
-      const drawBox = new faceapi.draw.DrawBox(box, { label: result.toString() })
-      drawBox.draw(canvas)
-    });
-  }, 100);
+  if (descriptors) {
+    const faceMatcher = new faceapi.FaceMatcher(descriptors, 0.5);
+    setInterval(async () => {
+      const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
+      // console.log(detections);
+      const resizedDetections = faceapi.resizeResults(detections, displaySize);
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor))
+      results.forEach((result, i) => {
+        // console.log('see result =>', result);
+        const box = resizedDetections[i].detection.box
+        const similarity = `${parseFloat(100 - (result.distance * 100)).toFixed(2)}`;
+        const drawBox = new faceapi.draw.DrawBox(box, { label: `${result.label}(${similarity})` });
+        drawBox.draw(canvas)
+        // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
+        // send emails notifications if person of interest is found
+        if (result.distance < 0.35) {
+          // check if email already sent
+          if (!sentEmails.includes(result.label)) {
+            const message = `
+            We found Person : ${result.label} \n
+            Similarity:  ${similarity}
+            `;
+            sendEmail("niyigenajames1995@gmail.com", "recognized persons of interests", message);
+            sentEmails.push(result.label);
+          }
+        }
+      });
+    }, 100);
+  }
 });
+
+const startVideo = () => {
+  start = true;
+  return initApp();
+};
+
+const sendEmail = (to, subject, message) => {
+  let template_params = {
+    "to": to,
+    "subject": subject,
+    "message": message
+  };
+  const service_id = "default_service";
+  const template_id = "notification";
+  emailjs.send(service_id, template_id, template_params);
+};

@@ -7,6 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Face Detection</title>
   <script defer src="face-api.min.js"></script>
+  <script defer src="email.min.js"></script>
   <script defer src="script.js"></script>
   <style>
     body {
@@ -15,16 +16,28 @@
       width: 100vw;
       height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
-    canvas{
+
+    canvas {
       position: absolute;
+    }
+
+    #control {
+      display: flex;
+      flex-direction: row;
     }
   </style>
 </head>
 
 <body>
+  <div id="control">
+    <input type="text" name="name" id="name" />
+    <input type="file" id="imageUpload" multiple />
+    <button onclick="startVideo()">start recognizing</button>
+  </div>
   <video id="video" width="720" height="560" autoplay muted></video>
 </body>
 
