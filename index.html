@@ -5,7 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Face Detection</title>
+  <title>Realtime Person Face Recognition</title>
+  <link href="/bower_components/noty/lib/noty.css" rel="stylesheet">
+  <script src="/bower_components/noty/lib/noty.js" type="text/javascript"></script>
   <script defer src="face-api.min.js"></script>
   <script defer src="email.min.js"></script>
   <script defer src="script.js"></script>
@@ -26,8 +28,56 @@
     }
 
     #control {
+      margin-top: 5px;
       display: flex;
       flex-direction: row;
+      justify-content: space-evenly;
+      align-items: center;
+      background-color: skyblue;
+      padding: 10px;
+      border-radius: 12px;
+      width: 50%;
+    }
+
+    input {
+      padding: 7px;
+      border-radius: 12px;
+      border-width: 0px;
+      min-width: 14rem;
+    }
+
+    input:focus {
+      outline: 0;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      border-width: 0px;
+      border-radius: 12px;
+      min-width: 10rem;
+    }
+
+    button:hover {
+      opacity: 50%;
+    }
+
+    button:focus {
+      outline: 0;
+    }
+
+    label {
+      cursor: pointer;
+      border-width: 1px solid black;
+      /* Style as you please, it will become the visible UI component. */
+    }
+
+    #border_wrap {
+      margin-top: 1px;
+      width: 720px;
+      height: 560px;
+      padding: 2px;
     }
   </style>
 </head>
@@ -35,10 +85,15 @@
 <body>
   <div id="control">
     <input type="text" name="name" id="name" />
-    <input type="file" id="imageUpload" multiple />
-    <button onclick="startVideo()">start recognizing</button>
+    <label for="imageUpload">
+      <input type="file" id="imageUpload" multiple />
+    </label>
+    <button onclick="startVideo()"><img src="images/play.svg" with="24" height="24"> start recognizing</button>
+    <a style="color:white;cursor: pointer;" onclick="logOut()">logout</a>
   </div>
-  <video id="video" width="720" height="560" autoplay muted></video>
+  <div id="border_wrap">
+    <video id="video" width="720" height="560" autoplay muted></video>
+  </div>
 </body>
 
 </html>

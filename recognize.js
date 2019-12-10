@@ -42,7 +42,7 @@ async function start() {
     saved = await faceapi.bufferToImage(addImage.files[0]);
     const detections = await faceapi.detectSingleFace(saved).withFaceLandmarks().withFaceDescriptor()
     descriptions.push(detections.descriptor);
-    return new faceapi.LabeledFaceDescriptors("Mucyo Fred", descriptions);
+    return new faceapi.LabeledFaceDescriptors("James Niyigena", descriptions);
     // console.log('descriptions', detections.descriptor);
   })
 }
@@ -64,7 +64,7 @@ async function start() {
 // }
 
 function loadLabeledImages() {
-  const labels = ['Mucyo Fred'];
+  const labels = ['James Niyigena'];
   return Promise.all(
     labels.map(async label => {
       const descriptions = []

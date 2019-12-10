@@ -1,3 +1,11 @@
+//check if user is loggedIn
+(async function () {
+  const loggedIn = await localStorage.getItem("loggedIn");
+  console.log('logged in -> ', loggedIn);
+  if (loggedIn != "true") {
+    window.location.assign("/login.html");
+  }
+})();
 // init email sending service
 (function () {
   emailjs.init("user_a7h6rpgrHx5QMHzQDDdeb");
@@ -44,7 +52,15 @@ imageUpload.addEventListener('change', async () => {
   console.log('see name ->', name);
   const descriptor = new faceapi.LabeledFaceDescriptors(name, descriptions);
   console.log(descriptor);
-  if (descriptor) descriptors.push(descriptor);
+  if (descriptor) {
+    descriptors.push(descriptor);
+    new Noty({
+      theme: 'nest',
+      text: 'Image Descriptor created successful!',
+      timeout: 500,
+      modal: true
+    }).show();
+  }
 });
 
 video.addEventListener('play', async () => {
@@ -53,7 +69,7 @@ video.addEventListener('play', async () => {
   const displaySize = { width: video.width, height: video.height };
   faceapi.matchDimensions(canvas, displaySize);
   if (descriptors) {
-    const faceMatcher = new faceapi.FaceMatcher(descriptors, 0.5);
+    const faceMatcher = new faceapi.FaceMatcher(descriptors, 0.4);
     setInterval(async () => {
       const detections = await faceapi.detectAllFaces(video).withFaceLandmarks().withFaceDescriptors();
       // console.log(detections);
@@ -68,7 +84,7 @@ video.addEventListener('play', async () => {
         drawBox.draw(canvas)
         // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
         // send emails notifications if person of interest is found
-        if (result.distance < 0.35) {
+        if (result.distance < 0.3) {
           // check if email already sent
           if (!sentEmails.includes(result.label)) {
             const message = `
@@ -76,6 +92,11 @@ video.addEventListener('play', async () => {
             Similarity:  ${similarity}
             `;
             sendEmail("niyigenajames1995@gmail.com", "recognized persons of interests", message);
+            new Noty({
+              theme: 'nest',
+              text: 'E-mail sent successful!',
+              timeout: 500,
+            }).show();
             sentEmails.push(result.label);
           }
         }
@@ -99,3 +120,8 @@ const sendEmail = (to, subject, message) => {
   const template_id = "notification";
   emailjs.send(service_id, template_id, template_params);
 };
+
+const logOut = () => {
+  localStorage.clear();
+  window.location.reload();
+}
