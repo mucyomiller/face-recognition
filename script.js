@@ -1,3 +1,5 @@
+// emails sents to
+const sentEmails = [];
 const video = document.getElementById('video');
 const imageUpload = document.getElementById('imageUpload');
 const _start = document.getElementById('start');
