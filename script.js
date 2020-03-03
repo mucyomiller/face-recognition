@@ -1,18 +1,3 @@
-//check if user is loggedIn
-(async function () {
-  const loggedIn = await localStorage.getItem("loggedIn");
-  console.log('logged in -> ', loggedIn);
-  if (loggedIn != "true") {
-    window.location.assign("/login.html");
-  }
-})();
-// init email sending service
-(function () {
-  emailjs.init("user_a7h6rpgrHx5QMHzQDDdeb");
-})();
-// emails sents to
-const sentEmails = [];
-
 const video = document.getElementById('video');
 const imageUpload = document.getElementById('imageUpload');
 const _start = document.getElementById('start');
@@ -41,7 +26,7 @@ function initApp() {
 imageUpload.addEventListener('change', async () => {
   // recognize my image
   const descriptions = [];
-  console.log('see ->', imageUpload.files);
+  console.log('Your Image ->', imageUpload.files);
   Array.from(imageUpload.files).forEach(async (image) => {
     let img = await faceapi.bufferToImage(image);
     let detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
@@ -49,9 +34,9 @@ imageUpload.addEventListener('change', async () => {
   });
 
   let name = document.querySelector('#name').value;
-  console.log('see name ->', name);
+  console.log('Your  name ->', name);
   const descriptor = new faceapi.LabeledFaceDescriptors(name, descriptions);
-  console.log(descriptor);
+  console.log('Your Image Descriptor ->', descriptor);
   if (descriptor) {
     descriptors.push(descriptor);
     new Noty({
@@ -84,17 +69,18 @@ video.addEventListener('play', async () => {
         drawBox.draw(canvas)
         // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
         // send emails notifications if person of interest is found
-        if (result.distance < 0.3) {
+        if (result.distance < 0.4) {
           // check if email already sent
           if (!sentEmails.includes(result.label)) {
             const message = `
             We found Person : ${result.label} \n
             Similarity:  ${similarity}
             `;
-            sendEmail("niyigenajames1995@gmail.com", "recognized persons of interests", message);
+            console.log('sending notification ');
+            //omitted notification sending part you can implement yours they way you want!
             new Noty({
               theme: 'nest',
-              text: 'E-mail sent successful!',
+              text: 'notification sent successful!',
               timeout: 500,
             }).show();
             sentEmails.push(result.label);
@@ -109,19 +95,3 @@ const startVideo = () => {
   start = true;
   return initApp();
 };
-
-const sendEmail = (to, subject, message) => {
-  let template_params = {
-    "to": to,
-    "subject": subject,
-    "message": message
-  };
-  const service_id = "default_service";
-  const template_id = "notification";
-  emailjs.send(service_id, template_id, template_params);
-};
-
-const logOut = () => {
-  localStorage.clear();
-  window.location.reload();
-}

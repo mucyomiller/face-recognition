@@ -42,29 +42,13 @@ async function start() {
     saved = await faceapi.bufferToImage(addImage.files[0]);
     const detections = await faceapi.detectSingleFace(saved).withFaceLandmarks().withFaceDescriptor()
     descriptions.push(detections.descriptor);
-    return new faceapi.LabeledFaceDescriptors("James Niyigena", descriptions);
+    return new faceapi.LabeledFaceDescriptors("Mucyo Miller", descriptions);
     // console.log('descriptions', detections.descriptor);
   })
 }
 
-// function loadLabeledImages() {
-//   const labels = ['Black Widow', 'Captain America', 'Captain Marvel', 'Hawkeye', 'Jim Rhodes', 'Thor', 'Tony Stark']
-//   return Promise.all(
-//     labels.map(async label => {
-//       const descriptions = []
-//       for (let i = 1; i <= 2; i++) {
-//         const img = await faceapi.fetchImage(`https://raw.githubusercontent.com/WebDevSimplified/Face-Recognition-JavaScript/master/labeled_images/${label}/${i}.jpg`)
-//         const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor()
-//         descriptions.push(detections.descriptor)
-//       }
-
-//       return new faceapi.LabeledFaceDescriptors(label, descriptions)
-//     })
-//   )
-// }
-
 function loadLabeledImages() {
-  const labels = ['James Niyigena'];
+  const labels = ['Mucyo Miller'];
   return Promise.all(
     labels.map(async label => {
       const descriptions = []
