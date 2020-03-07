@@ -17,6 +17,11 @@ right click on `index.html` > open with Live Server.
 - add your image to get recognized in Live Feeds from your webcam
 - after seeing that image descriptor created successfully
 - go ahead and start recognizing :tada: !
+## screenshots
+
+![](images/img1.png)   
+![](images/img2.png)   
+![](images/img3.png)   
 
 ## Developer
 
