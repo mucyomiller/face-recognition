@@ -25,4 +25,4 @@ right click on `index.html` > open with Live Server.
 
 ## Developer
 
-Mucyo Fred e-mail: me at mucyofred to com
+Mucyo Fred e-mail: me at mucyofred dot com
